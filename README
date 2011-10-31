@@ -12,7 +12,7 @@ Ensure
        
        post-flame/mops_common/850K/in_cg_sg/flamepp_256
 
-contains the required mops binary (mops.x) and the correct chem.inp, therm.dat, and sweep.xml for your gasphase and particle mechanism.  It should be necessary to alter mops.inx_template when running in flamepp mode.
+contains the required mops binary (mops.x) and the correct chem.inp, therm.dat, and sweep.xml for your gasphase and particle mechanisms.  It should not be necessary to alter mops.inx_template when running in flamepp mode.
 
 Finally, add any columns present in your streamline csv file, but not required by MOPS to
 	
@@ -21,7 +21,7 @@ Finally, add any columns present in your streamline csv file, but not required b
 
 To post-process the flame, simply run:
 
-(time ./postFlame SL_3pt_points.csv fields_to_ignore mops_tst_run Z1 256 1e-3 /home/userspace/ajs224/CFD-MOPS/post-flame/mops_common/850K/in_cg_sg/flamepp_256) |& mops.log
+(time ./postFlame SL_3pt_points.csv fields_to_ignore mops_tst_run Z1 256 1e-3 ~/post-flame/mops_common/850K/in_cg_sg/flamepp_256) |& mops.log
 
 where "SL_3pt_points.csv" is the paraview generated list of streamlines, "fields_to_ignore" is a list of fields output by paraview which are not required by MOPS, "mops_tst_run" is a directory into which all the track data will be placed, and "Z1" is some arbitrary flame name.
 
