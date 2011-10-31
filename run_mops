@@ -1,0 +1,107 @@
+#!/bin/bash
+#SCRIPTS_DIR="/home/userspace/ajs224/CFD-MOPS/MOPS-postproc/scripts"
+
+MOPS_BIN="mops.x"
+#MOPS_BIN="mops_nocoag.x"
+
+if [ $# -lt 5 ]; then
+    echo "Usage: $0 <dir containing track files> <run name> <pcount> <max M0> <mops src dir containing mops.inx_template>"
+    echo "e.g., $0 mops_tst_run Z1 256 1e-3 /home/userspace/ajs224/CFD-MOPS/post-flame/mops_common/850K/in_cg_sg/flamepp_256"
+    echo "This currently has a fixed number of steps (1) and splits (10) per time step.  A more sophisticated method would change these based on the local concentraton gradient." 
+    exit
+fi
+MOPS_RUN_DIR=$1
+RUNNAME=$2
+PCOUNT=$3
+MAXM0=$4
+MOPS_SOURCE_DIR=$5
+
+MOPS_LCN=$MOPS_SOURCE_DIR # Can override this
+
+echo "Attempting to run mops in $MOPS_RUN_DIR using binary $MOPS_BIN..."
+
+if [ ! -d $MOPS_RUN_DIR ]; then
+    #echo "Running generate_mops_inps.pl..."
+    #./generate_mops_inps.pl
+    #echo "Done!"
+
+    echo "You must run generate_mops_inps.pl first!"
+
+    exit
+fi
+
+cd $MOPS_RUN_DIR
+
+for TRACK in `ls`
+do
+    if [ -d $TRACK ]; then
+	if [ -e $TRACK/"jobstarted" ]; then
+	    echo "MOPS job already started in $TRACK."
+	else
+	    echo "MOPS job not yet started in $TRACK."
+	    echo -n "Setting up files in $TRACK..."
+	    
+	    # Choose to make copy rather than specifing location to mops on the command line
+	    # using -s, -c, -t, and -rr flags so files can be locally modified for testing
+	    MOPS_FILE_ARGS="-s $MOPS_SOURCE_DIR/sweep.xml -t $MOPS_SOURCE_DIR/therm.dat -c $MOPS_SOURCE_DIR/chem.inp -ss $MOPS_SOURCE_DIR/sweep.xml"
+	    # MOPS_FILE_ARGS=$MOPS_FILE_ARGS" -diag4" # Turn on full diagnostics output
+
+	    ln -s $MOPS_LCN/$MOPS_BIN $TRACK/
+
+	    echo "Done!"
+	    echo "Entering $TRACK..."
+	    cd $TRACK
+	    
+	    # This gets the final time
+	    TIME=`tail -1 gasphase.inp | cut -f1`
+	    
+	    # This gets all of the time intervals (and escapes the troublesome CRs, /s and "s)
+	    REGEXP='s/\n//g,s/\//\\\//g,s/\"/\\\"/g'
+	    perl -p -e $REGEXP time_intervals > times.inx
+	    
+	    TIMEINTERVALS=`cat times.inx`
+	    
+	    # clean up
+	    rm times.inx
+
+	    # Setting up input file
+	    #REGEXP='s/RUNNAME/$RUNNAME/,s/PCOUNT/$PCOUNT/,s/MAXM0/$MAXM0/,s/TIMEINTERVALS/$TIMEINTERVALS/'
+	    REGEXP="s/RUNNAME/$RUNNAME/,s/PCOUNT/$PCOUNT/,s/MAXM0/$MAXM0/,s/TIMEINTERVALS/"$TIMEINTERVALS"/"
+  	    
+	    perl -p -e "$REGEXP" $MOPS_SOURCE_DIR/mops.inx_template > mops.inx
+
+	    touch jobstarted
+
+	    echo "Running MOPS..."
+	    (time ./$MOPS_BIN $MOPS_FILE_ARGS -flamepp -p ) |& tee mops_run.log
+	    touch jobfinished
+	    
+	    # Post-processing routines
+	    #echo "Running rudimentary post-processing..."
+	    
+	    # These params should be obtained automatically (for now they are fixed)
+	    #MBW="0.03"
+	    #MIN="2.5"
+	    #FILENAME=$RUNNAME
+	    #PPSD="no"
+	    #FINTIMEONLY="yes" # actually with a single step there will only be a final time in this case
+
+	    #$SCRIPTS_DIR/generate_psds.pl $FILENAME $MBW $MIN $PPSD $FINTIMEONLY
+
+	    # Clean up
+	    #echo "Cleaning up..."
+	    #PSDSDIR="PSDs"
+	    #mkdir $PSDSDIR
+	    #mv x-* $PSDSDIR
+	    #mv y-* $PSDSDIR
+	    #mv *_psd_* $PSDSDIR
+	    #echo "Done!"
+	    
+	    cd ../
+	     
+	fi
+    fi
+    
+done
+
+

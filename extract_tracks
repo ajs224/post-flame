@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# Bash script to extract tracks from paraView generated csv files
+# A. J. Smith (ajs224@cam.ac.uk)
+
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 <species csv filename> <case name>"
+    echo "e.g., $0 species_data.csv mops_tst_run"
+    exit
+fi
+
+FileName=$1 
+CaseName=$2
+
+TimeIndex=`head -1 $FileName | perl -pi -e 's/,/\r\n/g' | perl -pi -e 's/\"//g' | nl -b a | grep Time | cut -f1`
+Times=`tail -n+2 $FileName | awk -F, -v tInd="$TimeIndex" '{print $tInd}'`
+Times=`echo $Times | perl -pi -e 's/,/\n/g'`
+#Times=`tail -n+2 $FileName | awk '{printf("%.6E\n", $TimeIndex);}'`
+
+
+timeBoundaries="1 "
+prevTime=-1
+timeInd=1
+
+for time in $Times
+do
+    timeGreater=`awk -v a="$time" -v b="$prevTime" 'BEGIN{print (a > b)}'`
+    if [ $timeGreater -gt 0 ]; then
+	prevTime=$time
+    else
+	echo "Found new track boundary..."
+	echo "timeInd=$timeInd, time=$time, prevTime=$prevTime"
+	#timeBoundaries=$timeBoundaries$prevTime","
+	timeBoundaries=$timeBoundaries$timeInd" "
+	prevTime=-1
+    fi
+    timeInd=$((timeInd + 1))
+
+done
+
+timeBoundaries=${timeBoundaries%" "}
+
+header=`head -1 $FileName`
+timeBoundaries=($timeBoundaries)
+
+noTracks=${#timeBoundaries[@]}
+
+
+i=0
+while [ $i -lt $noTracks ]
+do
+
+    
+
+    start=${timeBoundaries[$i]}
+    i=$[$i+1]
+    
+    if [ $i -eq $noTracks ]; then
+	stop=`wc $FileName | perl -ne 'm/^\s+(\d+)/; print $1'`
+    else
+	stop=${timeBoundaries[$i]}
+    fi
+    #echo "startLine=$start, stopLine=$stop"
+
+    dirName="track"`printf "%06d\n" $i`
+    echo "Creating $dirName..."
+    mkdir -p $CaseName"/"$dirName
+
+    gpFile=$CaseName"/"$dirName"/""gasphase_MassFrac.inp"
+    
+    echo $header > $gpFile
+
+    tail -n+2 $FileName | awk -F, -v a=$start -v b=$stop 'NR==a,NR==b' >> $gpFile
+    
+   
+
+
+done

@@ -1,0 +1,48 @@
+#!/bin/bash
+# Bash script to massage species data into format to facilitate preprocessing 
+# A. J. Smith (ajs224@cam.ac.uk)
+
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <specied csv filename>"
+    echo "e.g., $0 species_data.csv" 
+    exit
+fi
+
+FileName=$1
+NoColumns=`head -1 $FileName | perl -pi -e 's/,/\r\n/g' | perl -pi -e 's/\"//g' | nl -b a | tail -1 | cut -f1`
+
+# Extract column indices for massaging
+timeIndex=`head -1 $FileName | perl -pi -e 's/,/\r\n/g' | perl -pi -e 's/\"//g' | nl -b a | grep Time | cut -f1 | perl -pi -e 's/\s+//g'`
+tempIndex=`head -1 $FileName | perl -pi -e 's/,/\r\n/g' | perl -pi -e 's/\"//g' | nl -b a | grep '\bT\b' | cut -f1 | perl -pi -e 's/\s+//g'`
+pressIndex=`head -1 $FileName | perl -pi -e 's/,/\r\n/g' | perl -pi -e 's/\"//g' | nl -b a | grep '\bp\b' | cut -f1 | perl -pi -e 's/\s+//g'`
+wdotIndex=`head -1 $FileName | perl -pi -e 's/,/\r\n/g' | perl -pi -e 's/\"//g' | nl -b a | grep wdotA4 | cut -f1 | perl -pi -e 's/\s+//g'`
+rhoIndex=`head -1 $FileName | perl -pi -e 's/,/\r\n/g' | perl -pi -e 's/\"//g' | nl -b a | grep rho | cut -f1 | perl -pi -e 's/\s+//g'`
+
+allIndices=`head -1 $FileName | perl -pi -e 's/,/\r\n/g' | perl -pi -e 's/\"//g' | nl -b a | cut -f1`
+
+ignoredIndices="$timeIndex $tempIndex $pressIndex $wdotIndex $rhoIndex"
+
+# Extract species columns
+speciesAwkArgs=""
+for i in $allIndices;
+do
+    ignore=`echo $ignoredIndices | perl -pi -e 's/ /\n/g' | grep "\b$i\b"`
+    if [ -z $ignore ]; then
+	speciesAwkArgs=$speciesAwkArgs"$"$i" "
+    fi
+    
+done    
+
+#speciesAwkArgs=`echo $speciesAwkArgs | perl -pi -e 's/\s+/"\\\t"/g'`
+speciesAwkArgs=`echo $speciesAwkArgs | perl -pi -e 's/\s+/","/g'`
+
+
+# We now have the species columns and the special column indices (Time, T, etc.) so we just need to glue these back together
+#awkArgs="$"$timeIndex"\"\t\"$"$tempIndex"\"\t\"$speciesAwkArgs\"\t\"$"$pressIndex"\"\t\"$"$wdotIndex
+awkArgs="$"$timeIndex"\",\"$"$tempIndex"\",\"$speciesAwkArgs\",\"$"$pressIndex"\",\"$"$wdotIndex"\",\"$"$rhoIndex
+
+
+# Glue columns back together in required order and remove quotes
+awk -F, "{print $awkArgs}" $FileName | perl -pi -e 's/\"//g'
+
+exit

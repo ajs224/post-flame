@@ -1,0 +1,41 @@
+#!/bin/bash
+# Bash script to removed named columns from csv files
+# A. J. Smith (ajs224@cam.ac.uk)
+
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 <paraview csv filename> <filename containing columns to ignore>"
+    echo "e.g., $0 SL_3pt_points.csv fields_to_ignore > species_data.csv" 
+    exit
+fi
+
+FileName=$1
+#Cols=`echo $2 | perl -pi -e 's/,/\n/g'` # headers given on the command line
+Cols=`cat $2`
+NoColumns=`head -1 $FileName | perl -pi -e 's/,/\r\n/g' | perl -pi -e 's/\"//g' | nl -b a | tail -1 | cut -f1`
+CutArgs="-f"
+ColIndices=""
+
+# Extract column indices for removal
+for Col in $Cols
+do
+    ColIndex=`head -1 $FileName | perl -pi -e 's/,/\r\n/g' | perl -pi -e 's/\"//g' | nl -b a | grep $Col | cut -f1`
+
+    ColIndices=$ColIndices" "$ColIndex
+done
+
+# List all column indices which aren't being removed
+for i in `seq 1 $NoColumns`;
+do
+    ignore=`echo $ColIndices | perl -pi -e 's/ /\n/g' | grep "\b$i\b"`
+    if [ -z $ignore ]; then
+	CutArgs=$CutArgs$i","
+    fi
+    
+done    
+
+CutArgs=${CutArgs%","}
+
+# Extract the columns which aren't being ignored and rename column
+cut -d"," $CutArgs $FileName | perl -pi -e 's/IntegrationTime/Time/g'
+
+exit

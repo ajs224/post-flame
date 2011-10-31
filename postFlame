@@ -1,0 +1,36 @@
+#!/bin/bash
+# Bash script to post-process flame data using MOPS
+# A. J. Smith (ajs224@cam.ac.uk)
+
+if [ $# -lt 7 ]; then
+    echo "Usage: $0 <paraview csv filename> <filename containing columns to ignore> <run name> <flame name> <# particles> <maxM0> <mops source files>"
+    echo "e.g., $0 SL_3pt_points.csv fields_to_ignore mops_tst_run Z1 256 1e-3 /home/userspace/ajs224/CFD-MOPS/post-flame/mops_common/850K/in_cg_sg/flamepp_256" 
+    exit
+fi
+FileName=$1
+IgnoreFields=$2
+RunName=$3
+FlameName=$4
+NoParticles=$5
+MaxM0=$6
+MOPS_SRC=$7
+
+echo "Removing extraneous fields..."
+./remove_columns $FileName $IgnoreFields > species_data_raw.csv # Remove the unwanted columns
+echo "Done!"
+
+echo "Massaging input into format required by MOPS..."
+./massage_inps species_data_raw.csv > species_data.csv # massage the file into format required by MOPS
+echo "Done!"
+
+echo "Extracting tracks..."
+./extract_tracks species_data.csv $RunName
+echo "Done!"
+
+echo "Converting gasphase to mole fractions and generating MOPS input files..."
+./generate_mops_inps.pl  $RunName
+echo "Done!"
+
+echo "Running MOPS..."
+#./run_mops $RunName $FlameName $NoParticles $MaxM0 $MOPS_SRC
+echo "Done!"

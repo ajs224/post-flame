@@ -1,0 +1,15 @@
+postFlame
+A. J. Smith (ajs224@cam.ac.uk)
+
+
+To post-process a flame, just run:
+
+./postFlame SL_3pt_points.csv fields_to_ignore mops_tst_run Z1 256 1e-3 /home/userspace/ajs224/CFD-MOPS/post-flame/mops_common/850K/in_cg_sg/flamepp_256
+
+or 
+
+(time ./postFlame SL_3pt_points.csv fields_to_ignore mops_tst_run Z1 256 1e-3 /home/userspace/ajs224/CFD-MOPS/post-flame/mops_common/850K/in_cg_sg/flamepp_256) |& mops.log
+
+where "SL_3pt_points.csv" is the paraview generated list of streamlines, "fields_to_ignore" is a list of fields output by paraview which are not required by MOPS, "mops_tst_run" is a directory into which all the track data will be placed, and "Z1" is the flame name.
+
+This will run the simulation with 256 particles and a max_m0 of 1e3.  The directory contains the mops.inx template, all the sweep, chemisty and thermo data and the mops binmary to use. 
