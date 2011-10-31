@@ -46,17 +46,8 @@ while ($track = readdir(DIR))
 
     chomp($header=<TRKFILE>); # Extract header
 
-  
-
      # Extract species names from headers
     my @headers=split(/,/, $header);
-
-    foreach (@headers)
-      {
-	print "head=", $_, "\n";
-      }
-
-
     shift(@headers); # Remove time
     shift(@headers); # Remove temp
     pop(@headers); # Remove p
@@ -67,18 +58,6 @@ while ($track = readdir(DIR))
     # Changed commas to tabs and change p to P
     $header=~ s/,/\t/g;
     $header=~ s/p/P/g;
-
-  print $header, "\n";
-
-
-foreach (@headers)
-      {
-	print "head=", $_, "\n";
-      }
-
-die;
-
-
 
     # This is actually required by MOPS
     $molFracGasPhaseFile="$runDir/".$track."/gasphase.inp";

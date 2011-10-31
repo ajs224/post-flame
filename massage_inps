@@ -43,7 +43,6 @@ speciesAwkArgs=${speciesAwkArgs%"\",\""}
 #awkArgs="$"$timeIndex"\"\t\"$"$tempIndex"\"\t\"$speciesAwkArgs\"\t\"$"$pressIndex"\"\t\"$"$wdotIndex
 awkArgs="$"$timeIndex"\",\"$"$tempIndex"\",\"$speciesAwkArgs\",\"$"$pressIndex"\",\"$"$wdotIndex"\",\"$"$rhoIndex
 
-
 # Glue columns back together in required order and remove quotes
 awk -F, "{print $awkArgs}" $FileName | perl -pi -e 's/\"//g'
 

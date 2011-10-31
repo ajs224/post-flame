@@ -50,8 +50,6 @@ i=0
 while [ $i -lt $noTracks ]
 do
 
-    
-
     start=${timeBoundaries[$i]}
     i=$[$i+1]
     
@@ -60,6 +58,9 @@ do
     else
 	stop=${timeBoundaries[$i]}
     fi
+
+    stop=$((stop - 1)) # Stop is set to the beginning of the next track
+
     #echo "startLine=$start, stopLine=$stop"
 
     dirName="track"`printf "%06d\n" $i`
