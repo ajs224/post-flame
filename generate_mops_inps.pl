@@ -18,7 +18,7 @@ if($numArgs<1)
 
 my $runDir=$ARGV[0];
 my $sourceDir="./mops_common/";
-my $molWeightFile=$sourceDir."TiCl4SystemMWs.dat"; # units kg/
+my $molWeightFile=$sourceDir."SystemMWs.dat"; # units kg/
 $gasphaseMassFrac="/gasphase_MassFrac.inp";
 
 my %mol_weight=();
@@ -90,9 +90,7 @@ while ($track = readdir(DIR))
 	my @speciesMassFracs=@track_data;
 
 	my $speciesIndex=0;
-	my $speciesMolFrac;
 
-	my @speciesMolFracs=();
 	my @speciesMolConcs=();
 
 	foreach $massFrac (@speciesMassFracs)

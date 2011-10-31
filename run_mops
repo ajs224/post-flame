@@ -41,7 +41,7 @@ do
 	    echo "MOPS job not yet started in $TRACK."
 	    echo -n "Setting up files in $TRACK..."
 	    
-	    MOPS_FILE_ARGS="-s $MOPS_SOURCE_DIR/sweep.xml -t $MOPS_SOURCE_DIR/therm.dat -c $MOPS_SOURCE_DIR/chem.inp -ss $MOPS_SOURCE_DIR/sweep.xml"
+	    MOPS_FILE_ARGS="-s $MOPS_SOURCE_DIR/sweep.xml -t $MOPS_SOURCE_DIR/therm.dat -c $MOPS_SOURCE_DIR/chem.inp -ss $MOPS_SOURCE_DIR/sensi.xml"
 	    # MOPS_FILE_ARGS=$MOPS_FILE_ARGS" -diag4" # Turn on full diagnostics output
 
 	    ln -s $MOPS_LCN/$MOPS_BIN $TRACK/

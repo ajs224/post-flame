@@ -2,14 +2,29 @@
 # A. J. Smith (ajs224@cam.ac.uk)
 # ------------------------------
 
-To post-process a flame, just run:
+In order to post-process a flame, update
 
-./postFlame SL_3pt_points.csv fields_to_ignore mops_tst_run Z1 256 1e-3 /home/userspace/ajs224/CFD-MOPS/post-flame/mops_common/850K/in_cg_sg/flamepp_256
+    post-flame/mops_common/SystemMWs.dat
 
-or 
+to contain the molecular weights of all species in your system (in kg/mol).
+
+Ensure 
+       
+       post-flame/mops_common/850K/in_cg_sg/flamepp_256
+
+contains the required mops binary (mops.x) and the correct chem.inp, therm.dat, and sweep.xml for your gasphase and particle mechanism.  It should be necessary to alter mops.inx_template when running in flamepp mode.
+
+Finally, add any columns present in your streamline csv file, but not required by MOPS to
+	
+	post-flame/fields_to_ignore 
+ 
+
+To post-process the flame, simply run:
 
 (time ./postFlame SL_3pt_points.csv fields_to_ignore mops_tst_run Z1 256 1e-3 /home/userspace/ajs224/CFD-MOPS/post-flame/mops_common/850K/in_cg_sg/flamepp_256) |& mops.log
 
 where "SL_3pt_points.csv" is the paraview generated list of streamlines, "fields_to_ignore" is a list of fields output by paraview which are not required by MOPS, "mops_tst_run" is a directory into which all the track data will be placed, and "Z1" is some arbitrary flame name.
 
 This will run the simulation with 256 particles and a max_m0 of 1e-3.  The directory "/home/userspace/ajs224/CFD-MOPS/post-flame/mops_common/850K/in_cg_sg/flamepp_256" contains the mops.inx template, all the sweep, chemisty and thermo data and the mops binary to use.  Make sure these files are consistent with the species contained in the generated gasphase.inp file. For flamepp mode it shouldn't be necessary to change the mops.inx file.
+
+
