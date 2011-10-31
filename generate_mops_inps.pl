@@ -47,7 +47,7 @@ while ($track = readdir(DIR))
 
     chomp($header=<TRKFILE>); # Extract header
 
-    # Extract species names from headers
+     # Extract species names from headers
     my @headers=split(/,/, $header);
     shift(@headers); # Remove time
     shift(@headers); # Remove temp
@@ -55,6 +55,10 @@ while ($track = readdir(DIR))
     pop(@headers); # Remove wdotA4
     pop(@headers); # Remove rho
     my @speciesNames=@headers;
+
+    # Changed commas to tabs and change p to P
+    $header=~ s/,/\t/g;
+    $header=~ s/p/P/g;
 
     # This is actually required by MOPS
     $molFracGasPhaseFile="$runDir/".$track."/gasphase.inp";
@@ -96,7 +100,7 @@ while ($track = readdir(DIR))
 	    $species=$speciesNames[$speciesIndex];
 
 	    #$mol_weight{$species} # units kg/mol
-	    #my $scaleFactor=1.0e6; # convert from m^3 to cm^3
+	    #rho # units kg/m^3
 	    my $scaleFactor=1.0e6; # convert from m^3 to cm^3
 	    #push(@speciesMolConcs, $rho*$massFrac/($mol_weight{$species}*$scaleFactor)); # units mol/cm^3
 	    push(@speciesMolConcs, $rho*$massFrac*$scaleFactor); # units mol/cm^3
