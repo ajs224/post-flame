@@ -32,5 +32,5 @@ echo "Converting gasphase to mole fractions and generating MOPS input files..."
 echo "Done!"
 
 echo "Running MOPS..."
-#./run_mops $RunName $FlameName $NoParticles $MaxM0 $MOPS_SRC
+./run_mops $RunName $FlameName $NoParticles $MaxM0 $MOPS_SRC
 echo "Done!"
