@@ -102,10 +102,10 @@ while ($track = readdir(DIR))
 	    #$mol_weight{$species} # units kg/mol
 	    #rho # units kg/m^3
 	    my $scaleFactor=1.0e6; # convert from m^3 to cm^3
-	    #push(@speciesMolConcs, $rho*$massFrac/($mol_weight{$species}*$scaleFactor)); # units mol/cm^3
-	    push(@speciesMolConcs, $rho*$massFrac*$scaleFactor); # units mol/cm^3
+	    #$mol_weight{$species}=1;
+	    push(@speciesMolConcs, $rho*$massFrac/($mol_weight{$species}*$scaleFactor)); # units mol/cm^3
 
-	    $speciesIndex++;
+	    $speciesIndex++; # Go to next species in profile
 
 	  }
 
