@@ -45,7 +45,6 @@ timeBoundaries=($timeBoundaries)
 
 noTracks=${#timeBoundaries[@]}
 
-
 i=0
 while [ $i -lt $noTracks ]
 do
@@ -72,8 +71,5 @@ do
     echo $header > $gpFile
 
     tail -n+2 $FileName | awk -F, -v a=$start -v b=$stop 'NR==a,NR==b' >> $gpFile
-    
-   
-
 
 done

@@ -55,7 +55,8 @@ while ($track = readdir(DIR))
     pop(@headers); # Remove rho
     my @speciesNames=@headers;
 
-    # Changed commas to tabs and change p to P
+    # Changed commas to tabs and change p to P, remove rho header
+    $header=~ s/,rho//g;
     $header=~ s/,/\t/g;
     $header=~ s/p/P/g;
 
@@ -129,7 +130,6 @@ while ($track = readdir(DIR))
 	my $steps=1;
 	my $splits=10;
 	print TIMEFILE "<time steps=\"",$steps,"\" splits=\"",$splits,"\">",$time,"</time>\n";
-
 
       }
 
