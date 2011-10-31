@@ -36,6 +36,8 @@ done
 #speciesAwkArgs=`echo $speciesAwkArgs | perl -pi -e 's/\s+/"\\\t"/g'`
 speciesAwkArgs=`echo $speciesAwkArgs | perl -pi -e 's/\s+/","/g'`
 
+# Remove trailing comma
+speciesAwkArgs=${speciesAwkArgs%"\",\""}
 
 # We now have the species columns and the special column indices (Time, T, etc.) so we just need to glue these back together
 #awkArgs="$"$timeIndex"\"\t\"$"$tempIndex"\"\t\"$speciesAwkArgs\"\t\"$"$pressIndex"\"\t\"$"$wdotIndex
